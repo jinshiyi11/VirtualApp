@@ -7,6 +7,7 @@ import android.app.job.IJobService;
 import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
@@ -69,7 +70,7 @@ public class StubJob extends Service {
                         service.putExtra("_VA_|_user_id_", VUserHandle.getUserId(key.vuid));
                         boolean bound = false;
                         try {
-                            bound = bindService(service, session, 0);
+                            bound = bindService(service, session, Context.BIND_AUTO_CREATE);
                         } catch (Throwable e) {
                             VLog.e(TAG, e);
                         }
