@@ -37,11 +37,15 @@ public class StubJob extends Service {
     private static final String TAG = StubJob.class.getSimpleName();
     private final SparseArray<JobSession> mJobSessions = new SparseArray<>();
     private JobScheduler mScheduler;
+    private int mJobId;
+
+
     private final IJobService mService = new IJobService.Stub() {
 
         @Override
         public void startJob(JobParameters jobParams) throws RemoteException {
             int jobId = jobParams.getJobId();
+            mJobId = jobId;
             IBinder binder = mirror.android.app.job.JobParameters.callback.get(jobParams);
             IJobCallback callback = IJobCallback.Stub.asInterface(binder);
             Map.Entry<JobId, JobConfig> entry = get().findJobByVirtualJobId(jobId);
@@ -91,6 +95,7 @@ public class StubJob extends Service {
                 }
             }
         }
+
     };
 
     /**
@@ -117,6 +122,16 @@ public class StubJob extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mService.asBinder();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        JobSession session = mJobSessions.get(mJobId);
+        if (session != null) {
+            unbindService(session);
+        }
     }
 
     private final class JobSession extends IJobCallback.Stub implements ServiceConnection {
