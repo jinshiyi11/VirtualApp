@@ -213,6 +213,7 @@
     <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
     <uses-permission android:name="android.permission.GET_INTENT_SENDER_INTENT" />
 
+
     <uses-permission
         android:name="android.permission.WRITE_APN_SETTINGS"
         tools:ignore="ProtectedPermissions" />
@@ -221,6 +222,10 @@
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
+
+
+    <uses-permission android:name="android.permission.SEND_DOWNLOAD_COMPLETED_INTENTS"/>
+    <uses-permission android:name="android.permission.ACCESS_ALL_DOWNLOADS"/>
 
     <application>
         <service
