@@ -2,6 +2,7 @@ package com.lody.virtual.server.notification;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.Parcel;
 import android.text.TextUtils;
 
 import com.lody.virtual.helper.utils.VLog;

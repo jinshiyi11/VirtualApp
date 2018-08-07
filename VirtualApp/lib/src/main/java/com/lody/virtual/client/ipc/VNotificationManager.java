@@ -1,6 +1,7 @@
 package com.lody.virtual.client.ipc;
 
 import android.app.Notification;
+import android.os.Parcel;
 import android.os.RemoteException;
 
 import com.lody.virtual.client.core.VirtualCore;

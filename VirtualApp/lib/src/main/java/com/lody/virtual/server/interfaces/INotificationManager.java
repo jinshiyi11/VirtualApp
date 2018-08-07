@@ -1,5 +1,6 @@
 package com.lody.virtual.server.interfaces;
 
+import android.os.Parcel;
 import android.os.RemoteException;
 
 /**

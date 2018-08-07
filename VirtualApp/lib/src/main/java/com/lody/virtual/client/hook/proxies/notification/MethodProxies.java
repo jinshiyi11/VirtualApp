@@ -2,6 +2,7 @@ package com.lody.virtual.client.hook.proxies.notification;
 
 import android.app.Notification;
 import android.os.Build;
+import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.MethodProxy;
@@ -47,6 +48,8 @@ class MethodProxies {
         }
     }
 
+    //(String pkg, String opPkg, String tag, int id,Notification notification, int userId)
+    //userId 一般为0 可以看源码，notify
     /* package */ static class EnqueueNotificationWithTag extends MethodProxy {
 
         @Override
@@ -60,6 +63,7 @@ class MethodProxies {
             if (getHostPkg().equals(pkg)) {
                 return method.invoke(who, args);
             }
+
             int notificationIndex = ArrayUtils.indexOfFirst(args, Notification.class);
             int idIndex = ArrayUtils.indexOfFirst(args, Integer.class);
             int tagIndex = (Build.VERSION.SDK_INT >= 18 ? 2 : 1);
@@ -80,6 +84,11 @@ class MethodProxies {
             if (Build.VERSION.SDK_INT >= 18 && args[1] instanceof String) {
                 args[1] = getHostPkg();
             }
+
+            for (Object obj : args) {
+                Log.d("Q_M", "----------------------->" + obj);
+            }
+
             return method.invoke(who, args);
         }
     }
@@ -171,4 +180,33 @@ class MethodProxies {
             return 0;
         }
     }
+
+//
+//    static class createNotificationChannels extends MethodProxy {
+//        @Override
+//        public String getMethodName() {
+//            return "createNotificationChannels";
+//        }
+//
+//        @Override
+//        public Object call(Object who, Method method, Object... args) throws Throwable {
+//
+//            Log.d("Q_M", "----------------------->createNotificationChannels");
+//
+//
+//            String pkg = (String) args[0];
+//            if (getHostPkg().equals(pkg)) {
+//                return method.invoke(who, args);
+//            }
+//
+//            Log.d("Q_M", "----------------------->createNotificationChannels" + "---" + args.length);
+//
+//
+//            for (Object obj : args) {
+//                Log.d("Q_M", "----------------------->" + obj);
+//            }
+//
+//            return 0;
+//        }
+//    }
 }
