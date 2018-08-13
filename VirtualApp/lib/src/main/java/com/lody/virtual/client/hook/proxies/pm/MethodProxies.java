@@ -22,6 +22,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IInterface;
 import android.os.Process;
+import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.MethodProxy;
@@ -976,6 +977,7 @@ class MethodProxies {
             }
             int userId = VUserHandle.myUserId();
             ApplicationInfo info = VPackageManager.get().getApplicationInfo(pkg, flags, userId);
+
             if (info != null) {
                 return info;
             }
@@ -983,6 +985,7 @@ class MethodProxies {
             if (info == null || !isVisiblePackage(info)) {
                 return null;
             }
+
             return info;
         }
 
