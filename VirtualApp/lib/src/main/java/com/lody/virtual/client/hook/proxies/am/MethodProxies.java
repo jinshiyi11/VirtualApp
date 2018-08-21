@@ -1528,17 +1528,34 @@ class MethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
+
+            Log.d("Q_M", "broadcastIntent 调用");
+
             Intent intent = (Intent) args[1];
             String type = (String) args[2];
             intent.setDataAndType(intent.getData(), type);
             if (VirtualCore.get().getComponentDelegate() != null) {
                 VirtualCore.get().getComponentDelegate().onSendBroadcast(intent);
             }
-            Intent newIntent = handleIntent(intent);
-            if (newIntent != null) {
-                args[1] = newIntent;
-            } else {
-                return 0;
+
+            if (args[3] != null && args[3] instanceof IIntentReceiver) {
+//                Log.d("Q_M", "broadcastIntent IIntentReceiver");
+                // TODO Q_M 这里不知道这么处理对不对
+                // TODO Q_M 为了处理下面这种发送广播的方式
+                // context.sendOrderedBroadcast(intent, null, this.mBroadcastReceiver, null, -1, null, null);
+                // return method.invoke(who, args);
+            }else{
+                Intent newIntent = handleIntent(intent);
+                if (newIntent != null) {
+                    args[1] = newIntent;
+                } else {
+                    return 0;
+                }
+
+//                Log.d("Q_M", "broadcastIntent:intent.getExtras =" + intent.getExtras());
+//                Log.d("Q_M", "broadcastIntent:intent.toURI =" + intent.toURI());
+//                Log.d("Q_M", "broadcastIntent:newIntent.getExtras =" + newIntent.getExtras());
+//                Log.d("Q_M", "broadcastIntent:newIntent.toURI =" + newIntent.toURI());
             }
 
             if (args[7] instanceof String || args[7] instanceof String[]) {

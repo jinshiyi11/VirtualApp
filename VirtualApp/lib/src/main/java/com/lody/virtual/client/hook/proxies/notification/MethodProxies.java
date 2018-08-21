@@ -87,8 +87,10 @@ class MethodProxies {
             }
 
             for (Object obj : args) {
-                Log.d("Q_M", "args----------------------->" + obj);
+//                Log.d("Q_M", "args----------------------->" + obj);
 
+                //TODO Q_M 如果Notification使用自动定义声音，那么无法访问到，那么取一种折中的方式
+                //TODO Q_M 把原来插件中的自定义声音改成默认声音，但是这样处理有缺陷
 //                if (obj instanceof Notification) {
 //                    Uri defaultSoundUrlUri = Uri.parse("android.resource://com.alibaba.android.rimet/raw/general");
 //                    ((Notification) obj).sound = defaultSoundUrlUri;
