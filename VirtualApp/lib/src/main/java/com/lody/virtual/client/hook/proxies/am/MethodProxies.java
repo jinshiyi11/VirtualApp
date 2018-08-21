@@ -1529,8 +1529,6 @@ class MethodProxies {
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
 
-            Log.d("Q_M", "broadcastIntent 调用");
-
             Intent intent = (Intent) args[1];
             String type = (String) args[2];
             intent.setDataAndType(intent.getData(), type);
