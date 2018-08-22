@@ -388,7 +388,7 @@ class MethodProxies {
             intent.setDataAndType(intent.getData(), resolvedType);
             IBinder resultTo = resultToIndex >= 0 ? (IBinder) args[resultToIndex] : null;
             int userId = VUserHandle.myUserId();
-
+            //Log.d("Q_M", "StartActivity "+intent.toURI());
             if (ComponentUtils.isStubComponent(intent)) {
                 return method.invoke(who, args);
             }
@@ -417,6 +417,8 @@ class MethodProxies {
             }
             // chooser
             if (ChooserActivity.check(intent)) {
+                //Log.d("Q_M", "StartActivity yes：" + intent.getAction());
+
                 intent.setComponent(new ComponentName(getHostContext(), ChooserActivity.class));
                 intent.putExtra(Constants.EXTRA_USER_HANDLE, userId);
                 intent.putExtra(ChooserActivity.EXTRA_DATA, options);
@@ -1542,7 +1544,7 @@ class MethodProxies {
                 // TODO Q_M 为了处理下面这种发送广播的方式
                 // context.sendOrderedBroadcast(intent, null, this.mBroadcastReceiver, null, -1, null, null);
                 // return method.invoke(who, args);
-            }else{
+            } else {
                 Intent newIntent = handleIntent(intent);
                 if (newIntent != null) {
                     args[1] = newIntent;
