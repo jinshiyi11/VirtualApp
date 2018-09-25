@@ -454,11 +454,12 @@ class MethodProxies {
                 }
 
                 //TODO Q_M 为了适配通过uri的方式调用外部相机拍照
-                Intent ii = UriCompat.fakeFileUri(intent);
-                args[intentIndex] = ii;
+                Intent fakedIntent = UriCompat.fakeFileUri(intent);
+                args[intentIndex] = fakedIntent;
 
                 return method.invoke(who, args);
             }
+            //Log.d("Q_M","intent  -->" + intent.toURI());
             int res = VActivityManager.get().startActivity(intent, activityInfo, resultTo, options, resultWho, requestCode, VUserHandle.myUserId());
             if (res != 0 && resultTo != null && requestCode > 0) {
                 VActivityManager.get().sendActivityResult(resultTo, resultWho, requestCode);
