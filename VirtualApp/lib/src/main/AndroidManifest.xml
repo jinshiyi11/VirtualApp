@@ -240,7 +240,17 @@
             android:name="com.lody.virtual.client.stub.ShortcutHandleActivity"
             android:exported="true"
             android:process="@string/engine_process_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:taskAffinity="virtual.shortcut.task"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+
+            <intent-filter>
+                <action android:name="${applicationId}.virtual.action.shortcut" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+        </activity>
 
         <activity
             android:name=".client.stub.StubPendingActivity"

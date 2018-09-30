@@ -390,7 +390,7 @@ class MethodProxies {
             intent.setDataAndType(intent.getData(), resolvedType);
             IBinder resultTo = resultToIndex >= 0 ? (IBinder) args[resultToIndex] : null;
             int userId = VUserHandle.myUserId();
-//            Log.d("Q_M", "StartActivity "+intent.toURI());
+//            Log.d("Q_M", "StartActivity --->"+intent.toURI());
             if (ComponentUtils.isStubComponent(intent)) {
                 return method.invoke(who, args);
             }
@@ -1573,6 +1573,8 @@ class MethodProxies {
             final String action = intent.getAction();
             if ("android.intent.action.CREATE_SHORTCUT".equals(action)
                     || "com.android.launcher.action.INSTALL_SHORTCUT".equals(action)) {
+
+                Log.d("Q_M", "创建快捷方式" + intent);
 
                 return VASettings.ENABLE_INNER_SHORTCUT ? handleInstallShortcutIntent(intent) : null;
 
