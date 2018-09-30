@@ -91,6 +91,7 @@ public class ShortcutServiceStub extends BinderInvocationProxy {
         }
     }
 
+    //https://www.jianshu.com/p/c3b862279e38
     @TargetApi(25)
     private static class RequestPinShortcut extends ReplaceCallingPkgMethodProxy {
         public RequestPinShortcut() {

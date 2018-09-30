@@ -1554,11 +1554,6 @@ class MethodProxies {
                 } else {
                     return 0;
                 }
-
-//                Log.d("Q_M", "broadcastIntent:intent.getExtras =" + intent.getExtras());
-//                Log.d("Q_M", "broadcastIntent:intent.toURI =" + intent.toURI());
-//                Log.d("Q_M", "broadcastIntent:newIntent.getExtras =" + newIntent.getExtras());
-//                Log.d("Q_M", "broadcastIntent:newIntent.toURI =" + newIntent.toURI());
             }
 
             if (args[7] instanceof String || args[7] instanceof String[]) {

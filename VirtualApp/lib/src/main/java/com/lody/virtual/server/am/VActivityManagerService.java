@@ -249,7 +249,7 @@ public class VActivityManagerService implements IActivityManager {
             callerApp = findProcessLocked(getCallingPid());
         }
         if (callerApp == null) {
-            //如果调用的进程是我们定义的调板进程，那么放开调用权限
+            //如果调用的进程是我们定义的跳板进程，那么放开调用权限
             //但是这个进程不能和VAMS 同一个进行，否则getCallingPid获取的是相机的进程
             String name = getAppNameByPID(getCallingPid());
             //Log.d("Q_M", "app_name = " + name);

@@ -29,7 +29,7 @@ import java.lang.reflect.Constructor;
  * Author: liuqiang
  * Date: 2018-08-25
  * Time: 12:03
- * Description: 类似于调板的中间层
+ * Description: 类似于跳板的中间层
  * 打通外部应用调用内部插件的过程
  */
 public class TrampolineContentProvider extends ContentProvider {
