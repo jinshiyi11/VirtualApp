@@ -22,6 +22,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IInterface;
 import android.os.Process;
+import android.util.Log;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.MethodProxy;
@@ -143,9 +144,9 @@ class MethodProxies {
 
     /**
      * @author Lody
-     *         <p>
-     *         public ActivityInfo getServiceInfo(ComponentName className, int
-     *         flags, int userId)
+     * <p>
+     * public ActivityInfo getServiceInfo(ComponentName className, int
+     * flags, int userId)
      */
     static class GetServiceInfo extends MethodProxy {
 
@@ -203,10 +204,10 @@ class MethodProxies {
 
     /**
      * @author Lody
-     *         <p>
-     *         <p>
-     *         public ActivityInfo getActivityInfo(ComponentName className, int
-     *         flags, int userId)
+     * <p>
+     * <p>
+     * public ActivityInfo getActivityInfo(ComponentName className, int
+     * flags, int userId)
      */
     static class GetActivityInfo extends MethodProxy {
 
@@ -416,6 +417,7 @@ class MethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
+
             String name = (String) args[0];
             int flags = (int) args[1];
             int userId = VUserHandle.myUserId();
@@ -976,6 +978,7 @@ class MethodProxies {
             }
             int userId = VUserHandle.myUserId();
             ApplicationInfo info = VPackageManager.get().getApplicationInfo(pkg, flags, userId);
+
             if (info != null) {
                 return info;
             }
@@ -983,6 +986,7 @@ class MethodProxies {
             if (info == null || !isVisiblePackage(info)) {
                 return null;
             }
+
             return info;
         }
 

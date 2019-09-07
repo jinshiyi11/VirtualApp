@@ -282,6 +282,15 @@ public class Reflect {
         return field(name).get();
     }
 
+    public <T> T opt(String name) {
+        try {
+            return field(name).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * 取得指定名称的字段
      *

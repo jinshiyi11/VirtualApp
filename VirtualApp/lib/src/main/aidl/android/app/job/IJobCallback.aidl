@@ -16,6 +16,7 @@
 
 package android.app.job;
 
+import android.app.job.JobWorkItem;
 /**
  * The server side of the JobScheduler IPC protocols.  The app-side implementation
  * invokes on this interface to indicate completion of the (asynchronous) instructions
@@ -49,4 +50,14 @@ interface IJobCallback {
      * @param reschedule Whether or not to reschedule this job.
      */
     void jobFinished(int jobId, boolean reschedule);
+
+    /*
+     * Called to report that job has completed processing a work item.
+     */
+    boolean completeWork(int jobId, int workId);
+
+    /*
+     * Called to deqeue next work item for the job.
+     */
+    JobWorkItem dequeueWork(int jobId);
 }

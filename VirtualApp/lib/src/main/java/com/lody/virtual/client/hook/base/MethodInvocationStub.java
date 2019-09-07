@@ -30,7 +30,9 @@ public class MethodInvocationStub<T> {
     private static final String TAG = MethodInvocationStub.class.getSimpleName();
 
     private Map<String, MethodProxy> mInternalMethodProxies = new HashMap<>();
+    //原始的对象
     private T mBaseInterface;
+    //动态代理生成的对象
     private T mProxyInterface;
     private String mIdentityName;
     private LogInvocation.Condition mInvocationLoggingCondition = LogInvocation.Condition.NEVER;
@@ -47,7 +49,11 @@ public class MethodInvocationStub<T> {
             if (proxyInterfaces == null) {
                 proxyInterfaces = MethodParameterUtils.getAllInterface(baseInterface.getClass());
             }
-            mProxyInterface = (T) Proxy.newProxyInstance(baseInterface.getClass().getClassLoader(), proxyInterfaces, new HookInvocationHandler());
+            mProxyInterface = (T) Proxy.newProxyInstance(
+                    baseInterface.getClass().getClassLoader(),
+                    proxyInterfaces,
+                    new HookInvocationHandler()
+            );
         } else {
             VLog.d(TAG, "Unable to build HookDelegate: %s.", getIdentityName());
         }
@@ -177,7 +183,7 @@ public class MethodInvocationStub<T> {
             if (mightLog) {
                 // Arguments to string is done before the method is called because the method might actually change it
                 argStr = Arrays.toString(args);
-                argStr = argStr.substring(1, argStr.length()-1);
+                argStr = argStr.substring(1, argStr.length() - 1);
             }
 
 

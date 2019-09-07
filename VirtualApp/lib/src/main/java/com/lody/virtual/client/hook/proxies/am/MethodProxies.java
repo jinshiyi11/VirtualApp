@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.RemoteException;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -52,6 +53,7 @@ import com.lody.virtual.client.stub.StubPendingService;
 import com.lody.virtual.client.stub.VASettings;
 import com.lody.virtual.helper.compat.ActivityManagerCompat;
 import com.lody.virtual.helper.compat.BuildCompat;
+import com.lody.virtual.helper.compat.UriCompat;
 import com.lody.virtual.helper.utils.ArrayUtils;
 import com.lody.virtual.helper.utils.BitmapUtils;
 import com.lody.virtual.helper.utils.ComponentUtils;
@@ -378,8 +380,6 @@ class MethodProxies {
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
 
-            Log.d("Q_M", "---->StartActivity 类");
-
             int intentIndex = ArrayUtils.indexOfObject(args, Intent.class, 1);
             if (intentIndex < 0) {
                 return ActivityManagerCompat.START_INTENT_NOT_RESOLVED;
@@ -390,7 +390,7 @@ class MethodProxies {
             intent.setDataAndType(intent.getData(), resolvedType);
             IBinder resultTo = resultToIndex >= 0 ? (IBinder) args[resultToIndex] : null;
             int userId = VUserHandle.myUserId();
-
+//            Log.d("Q_M", "StartActivity --->"+intent.toURI());
             if (ComponentUtils.isStubComponent(intent)) {
                 return method.invoke(who, args);
             }
@@ -419,6 +419,8 @@ class MethodProxies {
             }
             // chooser
             if (ChooserActivity.check(intent)) {
+                //Log.d("Q_M", "StartActivity yes：" + intent.getAction());
+
                 intent.setComponent(new ComponentName(getHostContext(), ChooserActivity.class));
                 intent.putExtra(Constants.EXTRA_USER_HANDLE, userId);
                 intent.putExtra(ChooserActivity.EXTRA_DATA, options);
@@ -440,10 +442,6 @@ class MethodProxies {
             if (activityInfo == null) {
                 VLog.e("VActivityManager", "Unable to resolve activityInfo : " + intent);
 
-                Log.d("Q_M", "---->StartActivity who=" + who);
-                Log.d("Q_M", "---->StartActivity intent=" + intent);
-                Log.d("Q_M", "---->StartActivity resultTo=" + resultTo);
-
                 if (intent.getPackage() != null && isAppPkg(intent.getPackage())) {
                     return ActivityManagerCompat.START_INTENT_NOT_RESOLVED;
                 }
@@ -455,8 +453,13 @@ class MethodProxies {
                     return 0;
                 }
 
+                //TODO Q_M 为了适配通过uri的方式调用外部相机拍照
+                Intent fakedIntent = UriCompat.fakeFileUri(intent);
+                args[intentIndex] = fakedIntent;
+
                 return method.invoke(who, args);
             }
+            //Log.d("Q_M","intent  -->" + intent.toURI());
             int res = VActivityManager.get().startActivity(intent, activityInfo, resultTo, options, resultWho, requestCode, VUserHandle.myUserId());
             if (res != 0 && resultTo != null && requestCode > 0) {
                 VActivityManager.get().sendActivityResult(resultTo, resultWho, requestCode);
@@ -1530,17 +1533,27 @@ class MethodProxies {
 
         @Override
         public Object call(Object who, Method method, Object... args) throws Throwable {
+
             Intent intent = (Intent) args[1];
             String type = (String) args[2];
             intent.setDataAndType(intent.getData(), type);
             if (VirtualCore.get().getComponentDelegate() != null) {
                 VirtualCore.get().getComponentDelegate().onSendBroadcast(intent);
             }
-            Intent newIntent = handleIntent(intent);
-            if (newIntent != null) {
-                args[1] = newIntent;
+
+            if (args[3] != null && args[3] instanceof IIntentReceiver) {
+//                Log.d("Q_M", "broadcastIntent IIntentReceiver");
+                // TODO Q_M 这里不知道这么处理对不对
+                // TODO Q_M 为了处理下面这种发送广播的方式
+                // context.sendOrderedBroadcast(intent, null, this.mBroadcastReceiver, null, -1, null, null);
+                // return method.invoke(who, args);
             } else {
-                return 0;
+                Intent newIntent = handleIntent(intent);
+                if (newIntent != null) {
+                    args[1] = newIntent;
+                } else {
+                    return 0;
+                }
             }
 
             if (args[7] instanceof String || args[7] instanceof String[]) {
@@ -1555,6 +1568,8 @@ class MethodProxies {
             final String action = intent.getAction();
             if ("android.intent.action.CREATE_SHORTCUT".equals(action)
                     || "com.android.launcher.action.INSTALL_SHORTCUT".equals(action)) {
+
+                Log.d("Q_M", "创建快捷方式" + intent);
 
                 return VASettings.ENABLE_INNER_SHORTCUT ? handleInstallShortcutIntent(intent) : null;
 

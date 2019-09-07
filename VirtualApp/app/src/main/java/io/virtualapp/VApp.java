@@ -30,7 +30,7 @@ public class VApp extends MultiDexApplication {
         super.attachBaseContext(base);
         mPreferences = base.getSharedPreferences("va", Context.MODE_MULTI_PROCESS);
         VASettings.ENABLE_IO_REDIRECT = true;
-        VASettings.ENABLE_INNER_SHORTCUT = false;
+        VASettings.ENABLE_INNER_SHORTCUT = true;
         try {
             VirtualCore.get().startup(base);
         } catch (Throwable e) {

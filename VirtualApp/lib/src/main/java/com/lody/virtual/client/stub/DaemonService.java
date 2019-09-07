@@ -33,9 +33,8 @@ public class DaemonService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-        startService(new Intent(this, InnerService.class));
         startForeground(NOTIFY_ID, new Notification());
-
+		startService(new Intent(this, InnerService.class));
 	}
 
 	@Override

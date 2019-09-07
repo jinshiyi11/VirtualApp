@@ -2,6 +2,7 @@ package com.lody.virtual.client.core;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +12,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ConditionVariable;
 import android.os.IBinder;
@@ -176,6 +181,7 @@ public final class VirtualCore {
             if (Looper.myLooper() != Looper.getMainLooper()) {
                 throw new IllegalStateException("VirtualCore.startup() must called in main thread.");
             }
+            Constants.SHORTCUT_ACTION = context.getPackageName() + Constants.SHORTCUT_ACTION;
             VASettings.STUB_CP_AUTHORITY = context.getPackageName() + "." + VASettings.STUB_DEF_AUTHORITY;
             ServiceManagerNative.SERVICE_CP_AUTH = context.getPackageName() + "." + ServiceManagerNative.SERVICE_DEF_AUTH;
             this.context = context;
@@ -412,6 +418,7 @@ public final class VirtualCore {
         return createShortcut(userId, packageName, null, listener);
     }
 
+
     public boolean createShortcut(int userId, String packageName, Intent splash, OnEmitShortcutListener listener) {
         InstalledAppInfo setting = getInstalledAppInfo(packageName, 0);
         if (setting == null) {
@@ -442,15 +449,23 @@ public final class VirtualCore {
         if (targetIntent == null) {
             return false;
         }
-        Intent shortcutIntent = new Intent();
-        shortcutIntent.setClassName(getHostPkg(), Constants.SHORTCUT_PROXY_ACTIVITY_NAME);
-        shortcutIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        if (splash != null) {
-            shortcutIntent.putExtra("_VA_|_splash_", splash.toUri(0));
+
+        Intent shortcutIntent = wrapperShortcutIntent(targetIntent, splash, packageName, userId);
+        //
+        if (Build.VERSION.SDK_INT >= 26) {
+            ShortcutInfo likeShortcut = new ShortcutInfo.Builder(getContext(), packageName + "@" + userId).setLongLabel(name).setShortLabel(name).setIcon(Icon.createWithBitmap(icon)).setIntent(shortcutIntent).build();
+            ShortcutManager shortcutManager = (ShortcutManager) getContext().getSystemService(ShortcutManager.class);
+            if (shortcutManager != null) {
+                try {
+                    shortcutManager.requestPinShortcut(
+                            likeShortcut,
+                            PendingIntent.getActivity(getContext(), packageName.hashCode() + userId, shortcutIntent, PendingIntent.FLAG_UPDATE_CURRENT).getIntentSender()
+                    );
+                } catch (Throwable th) {
+                    return false;
+                }
+            }
         }
-        shortcutIntent.putExtra("_VA_|_intent_", targetIntent);
-        shortcutIntent.putExtra("_VA_|_uri_", targetIntent.toUri(0));
-        shortcutIntent.putExtra("_VA_|_user_id_", userId);
 
         Intent addIntent = new Intent();
         addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
@@ -485,22 +500,30 @@ public final class VirtualCore {
         if (targetIntent == null) {
             return false;
         }
+        Intent shortcutIntent = wrapperShortcutIntent(targetIntent, splash, packageName, userId);
+
+        if (Build.VERSION.SDK_INT < 26) {
+            Intent addIntent = new Intent();
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+            addIntent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
+            context.sendBroadcast(addIntent);
+        }
+        return true;
+    }
+
+    public Intent wrapperShortcutIntent(Intent intent, Intent splash, String packageName, int userId) {
         Intent shortcutIntent = new Intent();
-        shortcutIntent.setClassName(getHostPkg(), Constants.SHORTCUT_PROXY_ACTIVITY_NAME);
-        shortcutIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        shortcutIntent.addCategory("android.intent.category.DEFAULT");
+        shortcutIntent.setAction(Constants.SHORTCUT_ACTION);
+        shortcutIntent.setPackage(getHostPkg());
         if (splash != null) {
             shortcutIntent.putExtra("_VA_|_splash_", splash.toUri(0));
         }
-        shortcutIntent.putExtra("_VA_|_intent_", targetIntent);
-        shortcutIntent.putExtra("_VA_|_uri_", targetIntent.toUri(0));
-        shortcutIntent.putExtra("_VA_|_user_id_", VUserHandle.myUserId());
-
-        Intent addIntent = new Intent();
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
-        addIntent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
-        context.sendBroadcast(addIntent);
-        return true;
+        shortcutIntent.putExtra("_VA_|_pkg_", packageName);
+        shortcutIntent.putExtra("_VA_|_uri_", intent.toUri(0));
+        shortcutIntent.putExtra("_VA_|_user_id_", userId);
+        return shortcutIntent;
     }
 
     public abstract static class UiCallback extends IUiCallback.Stub {
