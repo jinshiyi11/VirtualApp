@@ -16,6 +16,7 @@ import android.content.res.Configuration;
 import android.os.Binder;
 import android.os.Build;
 import android.os.ConditionVariable;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.IInterface;
@@ -400,6 +401,8 @@ public final class VClientImpl extends IVClient.Stub {
 
     @SuppressLint("SdCardPath")
     private void startIOUniformer() {
+        //Log.d(TAG,"startIOUniformer");
+        //Debug.waitForDebugger();
         ApplicationInfo info = mBoundApplication.appInfo;
         int userId = VUserHandle.myUserId();
         String wifiMacAddressFile = deviceInfo.getWifiFile(userId).getPath();
@@ -413,7 +416,9 @@ public final class VClientImpl extends IVClient.Stub {
             NativeEngine.redirectDirectory("/data/user_de/0/" + info.packageName, info.dataDir);
         }
         String libPath = VEnvironment.getAppLibDirectory(info.packageName).getAbsolutePath();
+        //Log.d(TAG,"startIOUniformer libPath:"+libPath);
         String userLibPath = new File(VEnvironment.getUserSystemDirectory(userId), info.packageName + "/lib").getAbsolutePath();
+        //Log.d(TAG,"startIOUniformer userLibPath:"+userLibPath);
         NativeEngine.redirectDirectory(userLibPath, libPath);
         NativeEngine.redirectDirectory("/data/data/" + info.packageName + "/lib/", libPath);
         NativeEngine.redirectDirectory("/data/user/0/" + info.packageName + "/lib/", libPath);

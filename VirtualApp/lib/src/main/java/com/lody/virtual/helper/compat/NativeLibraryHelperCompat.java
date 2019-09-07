@@ -22,13 +22,13 @@ public class NativeLibraryHelperCompat {
 
 	public static int copyNativeBinaries(File apkFile, File sharedLibraryDir) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			return copyNativeBinariesAfterL(apkFile, sharedLibraryDir);
+			return copyNativeBinariesAfterLollipop(apkFile, sharedLibraryDir);
 		} else {
-			return copyNativeBinariesBeforeL(apkFile, sharedLibraryDir);
+			return copyNativeBinariesBeforeLollipop(apkFile, sharedLibraryDir);
 		}
 	}
 
-	private static int copyNativeBinariesBeforeL(File apkFile, File sharedLibraryDir) {
+	private static int copyNativeBinariesBeforeLollipop(File apkFile, File sharedLibraryDir) {
 		try {
 			return Reflect.on(NativeLibraryHelper.TYPE).call("copyNativeBinariesIfNeededLI", apkFile, sharedLibraryDir)
 					.get();
@@ -39,7 +39,7 @@ public class NativeLibraryHelperCompat {
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private static int copyNativeBinariesAfterL(File apkFile, File sharedLibraryDir) {
+	private static int copyNativeBinariesAfterLollipop(File apkFile, File sharedLibraryDir) {
 		try {
 			Object handle = NativeLibraryHelper.Handle.create.call(apkFile);
 			if (handle == null) {

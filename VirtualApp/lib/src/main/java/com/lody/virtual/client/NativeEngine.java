@@ -75,6 +75,7 @@ public class NativeEngine {
     }
 
     public static void redirectDirectory(String origPath, String newPath) {
+        //VLog.d(TAG,"redirectDirectory"+origPath+"->"+newPath);
         if (!origPath.endsWith("/")) {
             origPath = origPath + "/";
         }

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <fb/include/fb/ALog.h>
 #include "SandboxFs.h"
 #include "Path.h"
 
@@ -96,6 +97,8 @@ const char *relocate_path(const char *path, int *result) {
         *result = NOT_MATCH;
         return NULL;
     }
+
+    //ALOGD("\n\nvirtual relocate_path path:%s",path);
     for (int i = 0; i < keep_item_count; ++i) {
         PathItem &item = keep_items[i];
         if (strcmp(item.path, path) == 0) {
@@ -114,16 +117,20 @@ const char *relocate_path(const char *path, int *result) {
     }
     for (int i = 0; i < replace_item_count; ++i) {
         ReplaceItem &item = replace_items[i];
+        //ALOGD("virtual relocate_path orig_path:%s,%s",item.orig_path,item.new_path);
         if (match_path(item.is_folder, item.orig_size, item.orig_path, path)) {
             *result = MATCH;
+            //ALOGD("virtual relocate_path:%s,MATCH",path);
             int len = strlen(path);
             if (len < item.orig_size) {
                 //remove last /
                 std::string redirect_path(item.new_path, 0, item.new_size - 1);
+                //ALOGD("virtual relocate_path:%s,%s",path,redirect_path.c_str());
                 return strdup(redirect_path.c_str());
             } else {
                 std::string redirect_path(item.new_path);
                 redirect_path += path + item.orig_size;
+                //ALOGD("virtual relocate_path:%s,%s",path,redirect_path.c_str());
                 return strdup(redirect_path.c_str());
             }
         }

@@ -33,8 +33,8 @@ public class MethodProxies {
         public Object call(Object who, Method method, Object... args) throws Throwable {
             Log.d("Q_M","call registerContentObserver");
             //降低 targetSdkVersion
-            if (Build.VERSION.SDK_INT >= 24 && args.length >= 5) {
-                args[4] = 22;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && args.length >= 5) {
+                args[4] = Build.VERSION_CODES.LOLLIPOP_MR1;
             }
             return super.call(who, method, args);
         }
